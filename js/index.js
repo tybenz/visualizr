@@ -13,6 +13,7 @@ var jsNode;
 var canvas = $( 'canvas' )[ 0 ];
 var ctx = canvas.getContext( '2d' );
 var bars = Array( 60 );
+var forward = true;
 
 function init() {
     try {
@@ -22,10 +23,20 @@ function init() {
         resize();
         $( window ).on( 'resize', resize );
 
+        flip();
         loadSong( 'audio/song.mp3' );
     } catch ( err ) {
         console.error( 'Web Audio API is not supported in this browser' );
     }
+}
+
+function flip() {
+    if ( forward ) {
+        forward = false;
+    } else {
+        forward = true;
+    }
+    setTimeout( flip, 5 * 1000 );
 }
 
 function loadSong( url ) {
@@ -66,7 +77,7 @@ function loadSong( url ) {
                         (function( i, average ) {
                             setTimeout( function() {
                                 bars[ i ] = average;
-                            }, 10 * i );
+                            }, 10 * ( forward ? i : 60 - i ) );
                         })( i, average );
                     }
                 }
