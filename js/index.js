@@ -22,7 +22,7 @@ function init() {
         resize();
         $( window ).on( 'resize', resize );
 
-        loadSong( 'https://s3.amazonaws.com/tybenz.assets/really_wanna.mp3' );
+        loadSong( 'audio/song.mp3' );
     } catch ( err ) {
         console.error( 'Web Audio API is not supported in this browser' );
     }
