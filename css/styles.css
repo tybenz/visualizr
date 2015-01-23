@@ -1,0 +1,83 @@
+html {
+  box-sizing: border-box;
+}
+
+* {
+  box-sizing: inherit;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #111;
+}
+
+canvas {
+  display: block;
+  background: #111;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+}
+
+.visualizr {
+  position: relative;
+  height: 100%;
+}
+
+.playpause {
+  z-index: 1;
+  position: absolute;
+  top: 100px;
+  left: 85px;
+  /* width: 35px; */
+  width: 48px;
+  height: 48px;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-image: url(../img/spinner.png);
+  -webkit-appearance: none;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  -webkit-animation: rotate .75s infinite linear;
+  -moz-animation: rotate .75s infinite linear;
+  animation: rotate .75s infinite linear;
+}
+
+@-webkit-keyframes rotate {
+    from {-webkit-transform: rotate(0deg);}
+    to {-webkit-transform: rotate(-360deg);}
+}
+
+@-moz-keyframes rotate {
+    from {-moz-transform: rotate(0deg);}
+    to {-moz-transform: rotate(-360deg);}
+}
+
+@keyframes rotate {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(-360deg);}
+}
+
+.playing .playpause {
+  background-image: url(../img/pause.png) !important;
+}
+
+.loaded .playpause {
+  width: 35px;
+  height: 48px;
+  background-image: url(../img/play.png);
+  background-position: center center;
+  color: transparent;
+  -webkit-animation: none;
+  -moz-animation: none;
+  animation: none;
+  top: 100px;
+  left: 100px;
+}

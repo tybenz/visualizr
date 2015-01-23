@@ -1,0 +1,33 @@
+{
+  "name": "visualizr",
+  "version": "0.0.1",
+  "description": "visualizr",
+  "main": "js/app.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tybenz/visualizr"
+  },
+  "dependencies": {
+    "jquery": "~2.1.1"
+  },
+  "devDependencies": {
+    "browserify": "~2.36.0",
+    "envify": "~1.2.0",
+    "reactify": "~0.4.0",
+    "statics": "~0.1.0",
+    "uglify-js": "~2.4.13",
+    "watchify": "~0.4.1"
+  },
+  "scripts": {
+    "start": "watchify -o js/bundle.js -v -d js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tyler Benziger",
+  "license": "MIT",
+  "browserify": {
+    "transform": [
+      "reactify",
+      "envify"
+    ]
+  }
+}
