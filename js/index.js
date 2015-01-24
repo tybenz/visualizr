@@ -74,7 +74,6 @@ function loadSong( url ) {
     request.responseType = 'arraybuffer';
 
     request.onload = function() {
-        $body.addClass( 'loaded' );
         context.decodeAudioData( request.response, function( buffer ) {
             songBuffer = buffer;
 
@@ -83,7 +82,9 @@ function loadSong( url ) {
             analyser.fftSize = 1024;
             jsNode = context.createScriptProcessor( 2048, 1, 1 );
             jsNode.connect( context.destination );
-            // play();
+
+            $body.addClass( 'loaded' );
+
             analyser.connect( jsNode );
 
             draw();
