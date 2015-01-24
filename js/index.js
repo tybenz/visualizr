@@ -1,4 +1,5 @@
 var $ = require( 'jquery' );
+var _ = require( 'lodash' );
 window.addEventListener( 'load', init, false );
 
 var context;
@@ -26,6 +27,7 @@ var animateSwitch = 5 * 1000;
 var $out = $( '[name=animate][value=out]' );
 var $in = $( '[name=animate][value=in]' );
 var $oscillate = $( '[name=animate][value=oscillate]' );
+var $hue = $( '[name=hue]' );
 var $delay = $( '[name=delay]' );
 var $width = $( '[name=width]' );
 var $height = $( '[name=height]' );
@@ -143,19 +145,21 @@ function draw() {
     requestAnimationFrame( draw );
 }
 
+var originalColors = [
+    'white',
+    'purple',
+    'magenta',
+    'pink',
+    'red',
+    'orange',
+    'yellow',
+    'green',
+    'cyan',
+    'blue'
+];
+var colors = _.extend( [], originalColors );
+
 function getColor( val ) {
-    var colors = [
-        'white',
-        'purple',
-        'magenta',
-        'pink',
-        'red',
-        'orange',
-        'yellow',
-        'green',
-        'cyan',
-        'blue'
-    ];
 
     var colorIndex = Math.floor( val / ( 10 * heightFactor ) );
     if ( colorIndex > 9 ) {
@@ -263,3 +267,14 @@ $height.on( 'input', function() {
 $oscillateDelay.on( 'input', function() {
     animateSwitch = Math.floor( $oscillateDelay.val() / 10 ) * 1000;
 })
+
+$hue.on( 'input', function() {
+    var count = Math.floor( $hue.val() / 10 );
+    colors = _.extend( [], originalColors );
+    for ( var i = 0; i < count; i++ ) {
+        colors.unshift( colors.pop() );
+    }
+    var whiteIndex = colors.indexOf( 'white' );
+    colors.splice( whiteIndex, 1 );
+    colors.unshift( 'white' );
+});
