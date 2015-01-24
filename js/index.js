@@ -17,7 +17,14 @@ var bars = Array( 300 );
 var forward = true;
 
 // Settings
-var hash = getHash();
+var globalHash;
+var hash = globalHash = getHash();
+if ( hash.hide_controls ) {
+    $( '.controls' ).addClass( 'hide' );
+}
+if ( hash.small ) {
+    $body.addClass( 'small' );
+}
 console.log( hash );
 var barCount = 60;
 var lineWidth = hash.width || 10;
@@ -263,7 +270,9 @@ function updateHash() {
         'hue=' + hue + '&' +
         'animate=' + animate + '&' +
         'auto_delay=' + animateSwitch + '&' +
-        'song=' + songName;
+        'song=' + songName + '&' +
+        'hide_controls=' + globalHash.hide_controls + '&' +
+        'small=' + globalHash.small;
 
     if ( window.location.hash != hash ) {
         window.location.hash = hash;

@@ -12,6 +12,10 @@ html {
   text-align: right;
 }
 
+.controls.hide {
+  display: none;
+}
+
 * {
   box-sizing: inherit;
 }
@@ -60,6 +64,11 @@ canvas {
   animation: rotate .75s infinite linear;
 }
 
+.small .playpause {
+  width: 24px;
+  height: 24px;
+}
+
 @-webkit-keyframes rotate {
     from {-webkit-transform: rotate(0deg);}
     to {-webkit-transform: rotate(-360deg);}
@@ -90,6 +99,11 @@ canvas {
   animation: none;
   top: 50px;
   left: 50px;
+}
+
+.small.loaded .playpause {
+  width: 17px;
+  height: 24px;
 }
 
 .controls {
