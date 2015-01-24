@@ -19,6 +19,7 @@ var forward = true;
 // Settings
 var barCount = 60;
 var lineWidth = 10;
+var lineGap = 10;
 var heightFactor = 5;
 var delay = 10;
 var animate = 'oscillate';
@@ -31,6 +32,7 @@ var $hue = $( '[name=hue]' );
 var $delay = $( '[name=delay]' );
 var $width = $( '[name=width]' );
 var $height = $( '[name=height]' );
+var $gap = $( '[name=gap]' );
 var $oscillateDelay = $( '[name=animate-oscillate]' );
 
 function init() {
@@ -121,7 +123,6 @@ function resize( evt ) {
 function draw() {
     var canvasWidth = canvas.width;
     var canvasHeight = canvas.height;
-    var lineGap = lineWidth;
 
     // clear the current state
     ctx.clearRect( 0, 0, canvasWidth, canvasHeight );
@@ -256,8 +257,12 @@ $delay.on( 'input', function() {
 
 $width.on( 'input', function() {
     var winWidth = $( window ).width();
-    barCount = ( winWidth / ( lineWidth * 2 ) ) / 2;
-    lineWidth = Math.floor( 20 * ( $width.val() / 100 ) );
+    barCount = ( winWidth / ( lineWidth + lineGap ) ) / 2;
+    lineWidth = 0.1 + Math.floor( ( $width.val() / 2 ) );
+});
+
+$gap.on( 'input', function() {
+    lineGap = Math.floor( ( $gap.val() / 5 ) );
 });
 
 $height.on( 'input', function() {
