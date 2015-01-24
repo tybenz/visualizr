@@ -1,7 +1,7 @@
 var $ = require( 'jquery' );
-var context;
 window.addEventListener( 'load', init, false );
 
+var context;
 var $body = $( 'body' );
 var playing = false;
 var songSource = null;
@@ -12,8 +12,24 @@ var analyser;
 var jsNode;
 var canvas = $( 'canvas' )[ 0 ];
 var ctx = canvas.getContext( '2d' );
-var bars = Array( 60 );
+var bars = Array( 300 );
 var forward = true;
+
+// Settings
+var barCount = 60;
+var lineWidth = 10;
+var heightFactor = 5;
+var delay = 10;
+var animate = 'oscillate';
+var animateSwitch = 5 * 1000;
+
+var $out = $( '[name=animate][value=out]' );
+var $in = $( '[name=animate][value=in]' );
+var $oscillate = $( '[name=animate][value=oscillate]' );
+var $delay = $( '[name=delay]' );
+var $width = $( '[name=width]' );
+var $height = $( '[name=height]' );
+var $oscillateDelay = $( '[name=animate-oscillate]' );
 
 function init() {
     try {
@@ -31,12 +47,14 @@ function init() {
 }
 
 function flip() {
-    if ( forward ) {
-        forward = false;
-    } else {
-        forward = true;
+    if ( $oscillate[0].checked ) {
+        if ( forward ) {
+            forward = false;
+        } else {
+            forward = true;
+        }
     }
-    setTimeout( flip, 5 * 1000 );
+    setTimeout( flip, animateSwitch );
 }
 
 function loadSong( url ) {
@@ -63,13 +81,14 @@ function loadSong( url ) {
                // get the average, bincount is fftsize / 2
                 var array =  new Uint8Array( analyser.frequencyBinCount );
                 analyser.getByteFrequencyData( array );
-                var average = getAverageVolume( array ) * 5;
+                var average = getAverageVolume( array );
+                var average = average * heightFactor;
 
                 bars[ 0 ] = average;
                 average *= 0.8;
                 if ( playing ) {
                     var reduce = 0;
-                    for ( var i = 1; i < 60; i++ ) {
+                    for ( var i = 1; i < barCount; i++ ) {
                         average = average - Math.sqrt( average ) + 1;
                         if ( average < 0 ) {
                             average = 0;
@@ -77,7 +96,7 @@ function loadSong( url ) {
                         (function( i, average ) {
                             setTimeout( function() {
                                 bars[ i ] = average;
-                            }, 10 * ( forward ? i : 60 - i ) );
+                            }, delay * ( forward ? i : 60 - i ) );
                         })( i, average );
                     }
                 }
@@ -92,6 +111,7 @@ function resize( evt ) {
     var $win = $( window );
     var winWidth = $win.width();
     var winHeight = $win.height();
+    barCount = ( winWidth / ( lineWidth * 2 ) ) / 2;
     canvas.width = winWidth;
     canvas.height = winHeight;
 }
@@ -99,8 +119,7 @@ function resize( evt ) {
 function draw() {
     var canvasWidth = canvas.width;
     var canvasHeight = canvas.height;
-    var lineWidth = 10;
-    var lineGap = 10;
+    var lineGap = lineWidth;
 
     // clear the current state
     ctx.clearRect( 0, 0, canvasWidth, canvasHeight );
@@ -110,7 +129,7 @@ function draw() {
     var average = bars[ 0 ];
     var color = getColor( average );
     rect( ( canvasWidth / 2 ) - ( lineWidth / 2 ), ( canvasHeight / 2 ) - ( average / 2 ), lineWidth, average, color );
-    for ( var i = 1, len = bars.length; i < len; i++ ) {
+    for ( var i = 1; i < barCount; i++ ) {
         var average = bars[ i ];
         color = getColor( average );
 
@@ -138,9 +157,9 @@ function getColor( val ) {
         'blue'
     ];
 
-    var colorIndex = Math.floor( val / 50 );
-    if ( colorIndex > 8 ) {
-        colorIndex = 8;
+    var colorIndex = Math.floor( val / ( 10 * heightFactor ) );
+    if ( colorIndex > 9 ) {
+        colorIndex = 9;
     } else if ( colorIndex < 0 ) {
         colorIndex = 0;
     }
@@ -212,3 +231,35 @@ $( '.playpause' ).on( 'click', function() {
         play();
     }
 });
+
+$out.on( 'click', function( evt ) {
+    if ( evt.currentTarget.checked ) {
+        forward = true;
+    }
+});
+
+$in.on( 'click', function( evt ) {
+    if ( evt.currentTarget.checked ) {
+        forward = false;
+    }
+});
+
+$delay.on( 'input', function() {
+    var val = $delay.val();
+    // console.log( val * 1.2 );
+    delay = Math.floor( val * 1.2 );
+});
+
+$width.on( 'input', function() {
+    var winWidth = $( window ).width();
+    barCount = ( winWidth / ( lineWidth * 2 ) ) / 2;
+    lineWidth = Math.floor( 20 * ( $width.val() / 100 ) );
+});
+
+$height.on( 'input', function() {
+    heightFactor = $height.val() / 10;
+});
+
+$oscillateDelay.on( 'input', function() {
+    animateSwitch = Math.floor( $oscillateDelay.val() / 10 ) * 1000;
+})

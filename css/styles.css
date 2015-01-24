@@ -1,5 +1,15 @@
 html {
   box-sizing: border-box;
+  color: white;
+  font-family: 'source-sans-pro', sans-serif;
+}
+
+.controls {
+  z-index: 1;
+  position: absolute;
+  top: 50px;
+  right: 50px;
+  text-align: right;
 }
 
 * {
@@ -31,8 +41,8 @@ canvas {
 .playpause {
   z-index: 1;
   position: absolute;
-  top: 100px;
-  left: 85px;
+  top: 50px;
+  left: 35px;
   /* width: 35px; */
   width: 48px;
   height: 48px;
@@ -78,6 +88,20 @@ canvas {
   -webkit-animation: none;
   -moz-animation: none;
   animation: none;
-  top: 100px;
-  left: 100px;
+  top: 50px;
+  left: 50px;
+}
+
+.controls {
+  font-size: 0.8em;
+  font-weight: 100;
+}
+
+input[type=range] {
+  position: relative;
+  top: 4px;
+}
+
+.field {
+  margin-bottom: 0.4em;
 }

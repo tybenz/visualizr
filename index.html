@@ -4,9 +4,34 @@
   <meta charset="UTF-8">
   <title>visualizr</title>
   <link rel="stylesheet" href="css/styles.css" type="text/css" />
+  <script src="//use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9.js"></script>
 </head>
 <body>
   <div class="visualizr">
+    <div class="controls">
+      <div class="field">
+        <label for="width">Width</label>
+        <input type="range" name="width" value="50">
+      </div>
+      <div class="field">
+        <label for="height">Height</label>
+        <input type="range" name="height" value="50">
+      </div>
+      <div class="field">
+        <label for="delay">Delay</label>
+        <input type="range" name="delay" value="8">
+      </div>
+      <div class="field">
+        <label style="margin-right:1em">Animate</label>
+        <input type="radio" name="animate" value="out" checked> <span>Out</span>
+        <input type="radio" name="animate" value="in"> <span>In</span>
+        <input type="radio" name="animate" value="oscillate"> <span>Auto</span>
+      </div>
+      <div class="field">
+        <label>Delay</label>
+        <input type="range" name="animate-oscillate" value="50">
+      </div>
+    </div>
     <button class="playpause"></button>
     <canvas></canvas>
   </div>
