@@ -17,23 +17,30 @@ var bars = Array( 300 );
 var forward = true;
 
 // Settings
+var hash = getHash();
+console.log( hash );
 var barCount = 60;
-var lineWidth = 10;
-var lineGap = 10;
-var heightFactor = 5;
-var delay = 10;
-var animate = 'oscillate';
-var animateSwitch = 5 * 1000;
+var lineWidth = hash.width || 10;
+var lineGap = hash.gap || 10;
+var heightFactor = hash.height || 5;
+var delay = hash.delay || 10;
+var animate = hash.animate || 'out';
+var animateSwitch = hash.auto_delay || 5 * 1000;
+var hue = hash.hue || 0;
+var songUrl = hash.song ?
+    'https://s3.amazonaws.com/tybenz.assets/visualizr/' + hash.song + '.mp3' :
+    'https://s3.amazonaws.com/tybenz.assets/visualizr/touch_this.mp3';
+var songName = hash.song || 'touch_this';
 
 var $out = $( '[name=animate][value=out]' );
 var $in = $( '[name=animate][value=in]' );
-var $oscillate = $( '[name=animate][value=oscillate]' );
+var $auto = $( '[name=animate][value=auto]' );
 var $hue = $( '[name=hue]' );
 var $delay = $( '[name=delay]' );
 var $width = $( '[name=width]' );
 var $height = $( '[name=height]' );
 var $gap = $( '[name=gap]' );
-var $oscillateDelay = $( '[name=animate-oscillate]' );
+var $autoDelay = $( '[name=auto-delay]' );
 
 function init() {
     try {
@@ -44,14 +51,14 @@ function init() {
         $( window ).on( 'resize', resize );
 
         flip();
-        loadSong( 'audio/song.mp3' );
+        loadSong( songUrl );
     } catch ( err ) {
         console.error( 'Web Audio API is not supported in this browser' );
     }
 }
 
 function flip() {
-    if ( $oscillate[0].checked ) {
+    if ( animate == 'auto' ) {
         if ( forward ) {
             forward = false;
         } else {
@@ -144,6 +151,8 @@ function draw() {
         }
     }
     requestAnimationFrame( draw );
+
+    updateHash();
 }
 
 var originalColors = [
@@ -161,6 +170,14 @@ var originalColors = [
 var colors = _.extend( [], originalColors );
 
 function getColor( val ) {
+    // account for hue index
+    colors = _.extend( [], originalColors );
+    for ( var i = 0; i < hue; i++ ) {
+        colors.unshift( colors.pop() );
+    }
+    var whiteIndex = colors.indexOf( 'white' );
+    colors.splice( whiteIndex, 1 );
+    colors.unshift( 'white' );
 
     var colorIndex = Math.floor( val / ( 10 * heightFactor ) );
     if ( colorIndex > 9 ) {
@@ -225,6 +242,40 @@ function togglePlaying() {
     }
 }
 
+function updateHash() {
+    var props = [];
+    var hash = '';
+    hash = 'width=' + lineWidth + '&' +
+        'height=' + heightFactor + '&' +
+        'gap=' + lineGap + '&' +
+        'delay=' + delay + '&' +
+        'hue=' + hue + '&' +
+        'animate=' + animate + '&' +
+        'auto_delay=' + animateSwitch + '&' +
+        'song=' + songName;
+
+    if ( window.location.hash != hash ) {
+        window.location.hash = hash;
+    }
+}
+
+function getHash() {
+    return window.location.hash
+    .replace( /^\#/, '' )
+    .split( '&' )
+    .reduce( function( memo, keyVal ) {
+        var key = keyVal.split( '=' )[ 0 ];
+        var val = keyVal.split( '=' )[ 1 ];
+
+        if ( key != 'animate' && key != 'song' ) {
+            val = parseInt( val );
+        }
+
+        memo[ key ] = val;
+        return memo;
+    }, {} );
+}
+
 function onError( err ) {
     console.error( err );
 }
@@ -240,14 +291,22 @@ $( '.playpause' ).on( 'click', function() {
 $out.on( 'click', function( evt ) {
     if ( evt.currentTarget.checked ) {
         forward = true;
+        animate = 'out';
     }
 });
 
 $in.on( 'click', function( evt ) {
     if ( evt.currentTarget.checked ) {
         forward = false;
+        animate = 'in';
     }
 });
+
+$auto.on( 'click', function( evt ) {
+    if ( evt.currentTarget.checked ) {
+        animate = 'auto';
+    }
+})
 
 $delay.on( 'input', function() {
     var val = $delay.val();
@@ -258,7 +317,7 @@ $delay.on( 'input', function() {
 $width.on( 'input', function() {
     var winWidth = $( window ).width();
     barCount = ( winWidth / ( lineWidth + lineGap ) ) / 2;
-    lineWidth = 0.1 + Math.floor( ( $width.val() / 2 ) );
+    lineWidth = 1 + Math.floor( ( $width.val() / 2 ) );
 });
 
 $gap.on( 'input', function() {
@@ -266,20 +325,13 @@ $gap.on( 'input', function() {
 });
 
 $height.on( 'input', function() {
-    heightFactor = $height.val() / 10;
+    heightFactor = 1 + ( $height.val() / 10 );
 });
 
-$oscillateDelay.on( 'input', function() {
-    animateSwitch = Math.floor( $oscillateDelay.val() / 10 ) * 1000;
+$autoDelay.on( 'input', function() {
+    animateSwitch = Math.floor( $autoDelay.val() / 10 ) * 1000;
 })
 
 $hue.on( 'input', function() {
-    var count = Math.floor( $hue.val() / 10 );
-    colors = _.extend( [], originalColors );
-    for ( var i = 0; i < count; i++ ) {
-        colors.unshift( colors.pop() );
-    }
-    var whiteIndex = colors.indexOf( 'white' );
-    colors.splice( whiteIndex, 1 );
-    colors.unshift( 'white' );
+    hue = Math.floor( $hue.val() / 10 );
 });
