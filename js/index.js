@@ -156,7 +156,7 @@ function draw() {
 }
 
 var originalColors = [
-    'white',
+    '#333',
     'purple',
     'magenta',
     'pink',
@@ -171,13 +171,23 @@ var colors = _.extend( [], originalColors );
 
 function getColor( val ) {
     // account for hue index
-    colors = _.extend( [], originalColors );
-    for ( var i = 0; i < hue; i++ ) {
-        colors.unshift( colors.pop() );
+    if ( hue == 0 ) {
+        colors = _.extend( [], originalColors );
+        for ( var i = 0; i < hue; i++ ) {
+            colors.unshift( colors.pop() );
+        }
+        var whiteIndex = colors.indexOf( '#333' );
+        colors.splice( whiteIndex, 1 );
+        colors.unshift( '#333' );
+    } else {
+        colors = Array( 10 );
+        colors[ 0 ] = '#333';
+        var lightness = 49;
+        for ( var i = 9; i >= 1; i-- ) {
+            colors[ i ] = 'hsl(' + hue + ', 100%, ' + lightness + '%)'
+            lightness -= 5;
+        }
     }
-    var whiteIndex = colors.indexOf( 'white' );
-    colors.splice( whiteIndex, 1 );
-    colors.unshift( 'white' );
 
     var colorIndex = Math.floor( val / ( 10 * heightFactor ) );
     if ( colorIndex > 9 ) {
@@ -333,5 +343,6 @@ $autoDelay.on( 'input', function() {
 })
 
 $hue.on( 'input', function() {
-    hue = Math.floor( $hue.val() / 10 );
+    // hue = Math.floor( $hue.val() / 10 );
+    hue = Math.floor( ( 361 * ( $hue.val() / 100 ) ) );
 });
