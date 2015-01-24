@@ -271,8 +271,8 @@ function updateHash() {
         'animate=' + animate + '&' +
         'auto_delay=' + animateSwitch + '&' +
         'song=' + songName + '&' +
-        'hide_controls=' + globalHash.hide_controls + '&' +
-        'small=' + globalHash.small;
+        'hide_controls=' + ( globalHash.hide_controls || 0 ) + '&' +
+        'small=' + ( globalHash.small || 0 );
 
     if ( window.location.hash != hash ) {
         window.location.hash = hash;
@@ -341,7 +341,7 @@ $width.on( 'input', function() {
 });
 
 $gap.on( 'input', function() {
-    lineGap = Math.floor( ( $gap.val() / 5 ) );
+    lineGap = Math.floor( ( $gap.val() / 2.5 ) );
 });
 
 $height.on( 'input', function() {
