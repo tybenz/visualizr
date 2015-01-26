@@ -10,7 +10,6 @@ var songBuffer = null;
 var startOffset = 0;
 var startTime = 0;
 var analyser;
-var jsNode;
 var canvas = $( 'canvas' )[ 0 ];
 var ctx = canvas.getContext( '2d' );
 var bars = Array( 300 );
@@ -87,39 +86,10 @@ function loadSong( url ) {
             analyser = context.createAnalyser();
             analyser.smoothingTimeConstant = 0.3;
             analyser.fftSize = 1024;
-            jsNode = context.createScriptProcessor( 2048, 1, 1 );
-            jsNode.connect( context.destination );
 
             $body.addClass( 'loaded' );
 
-            analyser.connect( jsNode );
-
-            draw();
-
-            jsNode.onaudioprocess = function() {
-               // get the average, bincount is fftsize / 2
-                var array =  new Uint8Array( analyser.frequencyBinCount );
-                analyser.getByteFrequencyData( array );
-                var average = getAverageVolume( array );
-                var average = average * heightFactor;
-
-                bars[ 0 ] = average;
-                average *= 0.8;
-                if ( playing ) {
-                    var reduce = 0;
-                    for ( var i = 1; i < barCount; i++ ) {
-                        average = average - Math.sqrt( average ) + 1;
-                        if ( average < 0 ) {
-                            average = 0;
-                        }
-                        (function( i, average ) {
-                            setTimeout( function() {
-                                bars[ i ] = average;
-                            }, delay * ( forward ? i : 60 - i ) );
-                        })( i, average );
-                    }
-                }
-            }
+            update();
 
         }, onError );
     }
@@ -133,6 +103,37 @@ function resize( evt ) {
     barCount = ( winWidth / ( lineWidth * 2 ) ) / 2;
     canvas.width = winWidth;
     canvas.height = winHeight;
+}
+
+function update() {
+   // get the average, bincount is fftsize / 2
+    var array =  new Uint8Array( analyser.frequencyBinCount );
+    analyser.getByteFrequencyData( array );
+    var average = getAverageVolume( array );
+    var average = average * heightFactor;
+
+    bars[ 0 ] = average;
+    average *= 0.8;
+    if ( playing ) {
+        var reduce = 0;
+        for ( var i = 1; i < barCount; i++ ) {
+            average = average - Math.sqrt( average ) + 1;
+            if ( average < 0 ) {
+                average = 0;
+            }
+            (function( i, average ) {
+                setTimeout( function() {
+                    bars[ i ] = average;
+                }, delay * ( forward ? i : 60 - i ) );
+            })( i, average );
+        }
+    }
+
+    draw();
+
+    updateHash();
+
+    requestAnimationFrame( update );
 }
 
 function draw() {
@@ -158,9 +159,6 @@ function draw() {
             rect( ( canvasWidth / 2 ) - ( lineWidth / 2 ) - ( ( lineWidth + lineGap ) * i ), ( canvasHeight / 2 ) - ( average / 2 ), lineWidth, average, color );
         }
     }
-    requestAnimationFrame( draw );
-
-    updateHash();
 }
 
 var originalColors = [
